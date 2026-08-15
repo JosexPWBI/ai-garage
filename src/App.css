@@ -1,0 +1,145 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top, #263248 0%, #10151f 45%, #07090d 100%);
+  color: #ffffff;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.garage {
+  min-height: 100vh;
+  padding: 70px 24px;
+}
+
+.hero {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #ff6b00;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(52px, 9vw, 88px);
+  line-height: 1;
+  letter-spacing: -4px;
+}
+
+.subtitle {
+  margin: 20px auto 40px;
+  max-width: 600px;
+  color: #aeb8c7;
+  font-size: 18px;
+}
+
+.garage-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 36px;
+  text-align: left;
+  background: rgba(20, 27, 38, 0.92);
+  border: 1px solid #30394a;
+  border-radius: 22px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+}
+
+.garage-card h2 {
+  margin-top: 0;
+  margin-bottom: 28px;
+  font-size: 28px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 22px;
+  color: #d8dee8;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+input {
+  width: 100%;
+  padding: 14px 16px;
+  color: #ffffff;
+  background: #0d121b;
+  border: 1px solid #354052;
+  border-radius: 10px;
+  font: inherit;
+  outline: none;
+}
+
+input:focus {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.14);
+}
+
+input[type="file"] {
+  padding: 12px;
+}
+
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 16px 20px;
+  color: white;
+  background: linear-gradient(135deg, #ff7a00, #ff4d00);
+  border: 0;
+  border-radius: 11px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 650px) {
+  .garage {
+    padding: 45px 16px;
+  }
+
+  .garage-card {
+    padding: 24px;
+  }
+
+  .vehicle-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}h1,
+.garage-card h2 {
+  color: #ffffff;
+}.vehicle-preview {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  border: 1px solid #354052;
+}
