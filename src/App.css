@@ -1,14 +1,28 @@
+:root {
+  --pwbi-cyan: #00A7C8;
+  --pwbi-lime: #B8F28B;
+  --pwbi-teal: #00384A;
+  --pwbi-black: #000000;
+  --pwbi-white: #FFFFFF;
+}
+
 * {
   box-sizing: border-box;
 }
 
+
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+ min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at top, #263248 0%, #10151f 45%, #07090d 100%);
+  radial-gradient(
+    circle at top,
+    var(--pwbi-teal) 0%,
+    #07131a 45%,
+    var(--pwbi-black) 100%
+  );
   color: #ffffff;
 }
 
@@ -30,7 +44,7 @@ body {
 
 .eyebrow {
   margin: 0 0 12px;
-  color: #ff6b00;
+color: var(--pwbi-cyan);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 3px;
@@ -56,9 +70,12 @@ h1 {
   padding: 36px;
   text-align: left;
   background: rgba(20, 27, 38, 0.92);
-  border: 1px solid #30394a;
-  border-radius: 22px;
+  border: 1px solid var(--pwbi-cyan);
+border-top: 3px solid var(--pwbi-lime);
+  border-radius: 10px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  position: relative;
+overflow: hidden;
 }
 
 .garage-card h2 {
@@ -89,8 +106,9 @@ input {
 }
 
 input:focus {
-  border-color: #ff6b00;
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.14);
+  border-color: var(--pwbi-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 167, 200, 0.18);
+
 }
 
 input[type="file"] {
@@ -107,57 +125,116 @@ button {
   width: 100%;
   padding: 16px 20px;
   color: white;
-  background: linear-gradient(135deg, #ff7a00, #ff4d00);
-  border: 0;
-  border-radius: 11px;
+ background: linear-gradient(
+  135deg,
+  var(--pwbi-cyan),
+  var(--pwbi-teal)
+);
+border: 1px solid var(--pwbi-lime);
+border-radius: 6px;
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
 }
 
 button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(184, 242, 139, 0.34);
+  filter: brightness(1.06);
 }
 
-@media (max-width: 650px) {
+
   .garage {
-    padding: 45px 16px;
+    padding: 32px 14px;
+  }
+
+  .hero {
+    width: 100%;
   }
 
   .garage-card {
-    padding: 24px;
+    padding: 20px;
+    border-radius: 14px;
   }
 
   .vehicle-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }
-}h1,
+
+  .vehicle-preview {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+  }
+
+  .build-result {
+    padding-top: 20px;
+  }
+
+  .build-result li {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .build-result li > div {
+    min-width: 0;
+  }
+
+  .build-result li p {
+    line-height: 1.45;
+  }
+
+  .build-result li strong {
+    white-space: nowrap;
+  }
+
+  .priority-badge {
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(42px, 14vw, 64px);
+  }
+
 .garage-card h2 {
   color: #ffffff;
-}.vehicle-preview {
-  width: 100%;
-  max-height: 360px;
-  object-fit: cover;
-  margin-bottom: 24px;
-  border-radius: 14px;
-  border: 1px solid #354052;
+}.build-result > p {
+  margin: 6px 0;
+  padding: 8px 10px;
+  background: rgba(0, 167, 200, 0.06);
+  border-left: 2px solid var(--pwbi-cyan);
+  font-size: 14px;
 }
-
+.build-result > p strong {
+  color: var(--pwbi-cyan);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  margin-right: 6px;
+}
 .build-result {
   margin-top: 28px;
   padding-top: 28px;
   border-top: 1px solid #30394a;
 }
 
-.build-result h2 {
+ .build-result h2 {
   margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--pwbi-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 22px;
+  line-height: 1.2;
 }
-
 .build-result h3 {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 14px;
   margin-top: 24px;
   margin-bottom: 14px;
-  color: #ff7a00;
+  color: var(--pwbi-cyan);
 }
 
 .build-result ul {
@@ -171,8 +248,8 @@ button:hover {
 .build-result li {
   padding: 16px;
   background: #0d121b;
-  border: 1px solid #30394a;
-  border-radius: 10px;
+  border: 1px solid var(--pwbi-cyan);
+  border-radius: 4px;
   color: #e7ecf3;
 }.build-result li {
   display: flex;
@@ -182,6 +259,199 @@ button:hover {
 }
 
 .build-result li strong {
-  color: #ff7a00;
+color: var(--pwbi-lime);
   white-space: nowrap;
 }
+.garage-card select {
+  width: 100%;
+  padding: 14px 12px;
+  margin-top: 8px;
+  margin-bottom: 18px;
+  background: #0d121b;
+  color: #ffffff;
+  outline: 2px solid var(--pwbi-cyan);
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.garage-card select:focus {
+  outline: 2px solid var(--pwbi-cyan);
+  outline-offset: 2px;
+}/* Sporty overall polish */
+.garage-card,
+.build-result {
+  border: 1px solid var(--pwbi-cyan);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.garage-card h2,
+.build-result h2 {
+  letter-spacing: -0.5px;
+}
+
+.garage-card label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Sporty advisor callout */
+.advisor-note {
+  margin: 20px 0 24px;
+  padding: 18px 20px;
+  background: linear-gradient(
+    135deg,
+rgba(0, 167, 200, 0.14),
+rgba(0, 56, 74, 0.10)
+  );
+border-left: 4px solid var(--pwbi-cyan);
+  border-radius: 10px;
+}
+
+.advisor-note h3 {
+  margin: 0 0 10px;
+  color: var(--pwbi-lime);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 800;
+}
+.advisor-note p {
+  margin: 0;
+  color: #d6deea;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* More performance-style result cards */
+.build-result li {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.build-result li:hover {
+  transform: translateX(4px);
+  border-color: var(--pwbi-cyan);
+}
+
+/* Stronger button feel */
+button {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+box-shadow: 0 8px 20px rgba(0, 167, 200, 0.28);
+}.priority-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: var(--pwbi-lime);
+  color: var(--pwbi-black);
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}.build-result li > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}.garage-card .form-error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  background: rgba(255, 90, 90, 0.08);
+  border-left: 3px solid #ff5a5a;
+  color: #ff9b9b;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border-radius: 4px;
+}
+input[type="file"] {
+  padding: 10px;
+  background: #0d121b;
+  border: 1px solid #30394a;
+  border-radius: 8px;
+  color: #d6deea;
+  font-size: 13px;
+}
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--pwbi-cyan);
+  border-radius: 6px;
+  background: rgba(0, 167, 200, 0.12);
+  color: var(--pwbi-white);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: var(--pwbi-cyan);
+  color: var(--pwbi-black);
+}.vehicle-preview {
+ 
+  .vehicle-preview {
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0 24px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid var(--pwbi-cyan);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 650px) {
+  .garage {
+    padding: 32px 14px;
+  }
+
+  .hero {
+    width: 100%;
+  }
+
+  .garage-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .vehicle-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .vehicle-preview {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+  }
+
+  .build-result {
+    padding-top: 20px;
+  }
+
+  .build-result li {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .build-result li > div {
+    min-width: 0;
+  }
+
+  .build-result li p {
+    line-height: 1.45;
+  }
+
+  .build-result li strong {
+    white-space: nowrap;
+  }
+
+  .priority-badge {
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: clamp(42px, 14vw, 64px);
+  }
+}}

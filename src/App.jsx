@@ -1,67 +1,190 @@
 import { useState } from 'react'
 import './App.css'
+import vehicleData from './VehicleData'
 
 function App() {
   const [year, setYear] = useState('')
   const [make, setMake] = useState('')
   const [model, setModel] = useState('')
+  const [goal, setGoal] = useState('Daily Driver')
   const [budget, setBudget] = useState('')
   const [photo, setPhoto] = useState(null)
   const [showBuild, setShowBuild] = useState(false)
+const [error, setError] = useState('')
+const currentVehicleKey = `${make} ${model}`.trim().toLowerCase()
+const currentVehicleProfile = vehicleData[currentVehicleKey]
+ function handlePhotoChange(e) {
+  const file = e.target.files[0]
 
-  function handlePhotoChange(e) {
-    const file = e.target.files[0]
+  setError('')
 
-    if (file) {
-      setPhoto(URL.createObjectURL(file))
-    }
+  if (!file) {
+    return
   }
 
-  function getRecommendations() {
-    const buildBudget = Number(budget) || 0
+  if (!file.type.startsWith('image/')) {
+    setError('Please upload a valid image file.')
+    e.target.value = ''
+    return
+  }
 
-    if (buildBudget >= 10000) {
-      return [
-        { name: 'Performance suspension and adjustable coilovers', percent: 25 },
-        { name: 'Lightweight wheels with performance tires', percent: 25 },
-        { name: 'Big brake upgrade', percent: 18 },
-        { name: 'Intake, exhaust, and ECU tune', percent: 20 },
-        { name: 'Exterior aero and appearance package', percent: 12 },
-      ]
-    }
+  if (file.size > 5 * 1024 * 1024) {
+    setError('Please upload an image smaller than 5 MB.')
+    e.target.value = ''
+    return
+  }
 
-    if (buildBudget >= 5000) {
-      return [
-        { name: 'Sport suspension or lowering springs', percent: 24 },
-        { name: 'Performance wheels and tires', percent: 36 },
-        { name: 'Upgraded brake pads and rotors', percent: 14 },
-        { name: 'Cat-back exhaust', percent: 18 },
-        { name: 'Exterior styling upgrades', percent: 8 },
-      ]
-    }
+  if (photo) {
+    URL.revokeObjectURL(photo)
+  }
 
-    if (buildBudget >= 2000) {
-      return [
-        { name: 'Quality performance tires', percent: 40 },
-        { name: 'Brake pad upgrade', percent: 18 },
-        { name: 'Lowering springs', percent: 25 },
-        { name: 'Intake or axle-back exhaust', percent: 17 },
-      ]
-    }
+  setPhoto(URL.createObjectURL(file))
+}
 
+   function getRecommendations() {
+  const buildBudget = Number(budget) || 0
+  const vehicleKey = `${make} ${model}`.trim().toLowerCase()
+const vehicleProfile = vehicleData[vehicleKey]
+const vehicleYear = Number(year)
+
+const yearMatches =
+  !vehicleProfile?.years ||
+  (vehicleYear >= vehicleProfile.years.start &&
+    vehicleYear <= vehicleProfile.years.end)
+console.log('vehicleKey:', vehicleKey, 'vehicleProfile:', vehicleProfile)
+if (vehicleProfile && yearMatches && vehicleProfile.priorities[goal]) {
+  const priorityPercents = [35, 30, 20, 15]
+
+  return vehicleProfile.priorities[goal].map((upgrade, index) => ({
+    name: upgrade,
+    percent: priorityPercents[index],
+    reason: `Recommended specifically for the ${vehicleProfile.make} ${vehicleProfile.model}, a ${vehicleProfile.category} platform.`,
+  }))
+  }
+  if (!vehicleProfile) {
+  console.log(`No vehicle-specific profile found for: ${vehicleKey}`)
+}
+  if (goal === 'Track') {
     return [
-      { name: 'Maintenance and reliability refresh', percent: 40 },
-      { name: 'Performance tires', percent: 30 },
-      { name: 'Brake pads and fluid', percent: 20 },
-      { name: 'Low-cost cosmetic upgrades', percent: 10 },
+      { name: 'Track-focused suspension setup', percent: 30 },
+      { name: 'Performance brake upgrade', percent: 25 },
+      { name: 'High-grip performance tires', percent: 25 },
+      { name: 'Cooling and reliability upgrades', percent: 12 },
+      { name: 'Lightweight performance parts', percent: 8 },
     ]
   }
+if (goal === 'Street Performance') {
+  return [
+    {
+      name: 'Sport suspension upgrade',
+      percent: 25,
+      reason: 'Improves handling response while keeping the car comfortable enough for regular street driving.',
+    },
+    {
+      name: 'Performance wheels and tires',
+      percent: 30,
+      reason: 'Adds grip, sharper steering feel, and a more aggressive street-performance look.',
+    },
+    {
+      name: 'Brake upgrade',
+      percent: 15,
+      reason: 'Provides stronger and more consistent braking to match the added performance.',
+    },
+    {
+      name: 'Intake, exhaust, and tune',
+      percent: 20,
+      reason: 'Improves throttle response, sound, and power without turning the car into a dedicated track build.',
+    },
+    {
+      name: 'Exterior styling upgrades',
+      percent: 10,
+      reason: 'Adds subtle visual upgrades that complement the performance-focused setup.',
+    },
+  ]
+}
 
-  function handleBuild() {
-    setShowBuild(true)
+if (goal === 'Show Car') {
+  return [
+    {
+      name: 'Premium wheels and fitment',
+      percent: 30,
+      reason: 'Improves stance, visual impact, and overall show-car presence.',
+    },
+    {
+      name: 'Lowering suspension or air ride',
+      percent: 25,
+      reason: 'Creates a more aggressive stance and gives the car a lower, cleaner profile.',
+    },
+    {
+      name: 'Exterior aero and body styling',
+      percent: 20,
+      reason: 'Adds visual character through splitters, spoilers, side skirts, or other body enhancements.',
+    },
+    {
+      name: 'Lighting and visual upgrades',
+      percent: 10,
+      reason: 'Upgraded lighting can modernize the look and add more visual impact at shows or meets.',
+    },
+    {
+      name: 'Interior appearance upgrades',
+      percent: 15,
+      reason: 'Improves the cabin with cosmetic touches that make the overall build feel more complete.',
+    },
+  ]
+}
+if (goal === 'Daily Driver') {
+  return [
+    {
+      name: 'Maintenance and reliability refresh',
+      percent: 30,
+      reason: 'Keeps the vehicle dependable by prioritizing fluids, filters, worn components, and preventative maintenance.',
+    },
+    {
+      name: 'Quality all-season or touring tires',
+      percent: 25,
+      reason: 'Improves everyday grip, ride quality, wet-weather safety, and predictable handling.',
+    },
+    {
+      name: 'Brake pads, rotors, and fluid',
+      percent: 20,
+      reason: 'Improves stopping performance and reliability without sacrificing daily drivability.',
+    },
+    {
+      name: 'Comfort and suspension refresh',
+      percent: 15,
+      reason: 'Replaces worn suspension components and improves ride quality for everyday driving.',
+    },
+      {
+      name: 'Practical appearance upgrades',
+      percent: 10,
+      reason: 'Leaves room for tasteful cosmetic improvements after reliability and safety are handled.',
+    },
+  ]
+}
+}
+
+function handleBuild() {
+  setError('')
+  setShowBuild(false)
+
+  if (!year.trim() || !make.trim() || !model.trim()) {
+    setError('Please enter the year, make, and model of your vehicle.')
+    return
   }
 
-  const recommendations = getRecommendations()
+  if (!goal) {
+    setError('Please choose a build goal.')
+    return
+  }
+
+  if (!budget || Number(budget) <= 0) {
+    setError('Please enter a valid build budget.')
+    return
+  }
+
+  setShowBuild(true)
+}
+const recommendations = getRecommendations()
   const buildBudget = Number(budget) || 0
 
   return (
@@ -125,7 +248,18 @@ function App() {
               />
             </label>
           </div>
-
+<label>
+  Build Goal
+  <select
+    value={goal}
+    onChange={(e) => setGoal(e.target.value)}
+  >
+    <option>Daily Driver</option>
+    <option>Street Performance</option>
+    <option>Track</option>
+    <option>Show Car</option>
+  </select>
+</label>
           <label>
             Build Budget
             <input
@@ -139,10 +273,31 @@ function App() {
           <button type="button" onClick={handleBuild}>
             Build My Garage
           </button>
-
+{error && (
+  <p className="form-error">
+    {error}
+  </p>
+)}
           {showBuild && (
             <div className="build-result">
-              <h2>Your AI Garage Plan</h2>
+              <h2>Your AI Garage Plan</h2> 
+              <div className="advisor-note">
+  <h3>Garage Advisor Note</h3>
+
+  <p>
+    {goal === 'Track' &&
+      'For a track-focused build, prioritize grip, braking, and reliability before adding horsepower.'}
+
+    {goal === 'Street Performance' &&
+      'For a street performance build, focus on balanced handling, braking, and drivability.'}
+
+    {goal === 'Show Car' &&
+      'For a show car build, invest in wheels, suspension, and appearance upgrades first for the biggest visual impact.'}
+
+    {goal === 'Daily Driver' &&
+      'For a daily driver build, prioritize reliability, comfort, tires, and braking before chasing extra power.'}
+  </p>
+</div> 
 
               <p>
                 <strong>Vehicle:</strong>{' '}
@@ -152,7 +307,16 @@ function App() {
               <p>
                 <strong>Budget:</strong> ${buildBudget.toLocaleString()}
               </p>
-
+            <p>
+  <strong>Build Goal:</strong> {goal}
+</p>
+<p className="profile-status">
+  {currentVehicleProfile?.years &&
+  Number(year) >= currentVehicleProfile.years.start &&
+  Number(year) <= currentVehicleProfile.years.end
+    ? 'VEHICLE-SPECIFIC PLAN'
+    : 'GENERAL RECOMMENDATION PLAN'}
+</p> 
               <h3>Recommended Upgrades</h3>
 
               <ul>
@@ -163,9 +327,36 @@ function App() {
 
                   return (
                     <li key={item.name}>
-                      <span>{item.name}</span>
-                      <strong>${estimatedPrice.toLocaleString()}</strong>
-                    </li>
+  <div>
+  
+  <span className="priority-badge">
+  {item.percent >= 25
+    ? 'HIGH PRIORITY'
+    : item.name.toLowerCase().includes('brake')
+    ? 'BRAKING'
+    : item.name.toLowerCase().includes('suspension')
+    ? 'HANDLING'
+    : item.name.toLowerCase().includes('wheel') ||
+      item.name.toLowerCase().includes('tire')
+    ? 'GRIP'
+    : item.name.toLowerCase().includes('intake') ||
+      item.name.toLowerCase().includes('exhaust') ||
+      item.name.toLowerCase().includes('tune')
+    ? 'POWER'
+    : item.name.toLowerCase().includes('style') ||
+      item.name.toLowerCase().includes('exterior') ||
+      item.name.toLowerCase().includes('interior')
+    ? 'STYLE'
+    : 'PERFORMANCE'}
+</span>
+
+  <span>{item.name}</span>
+
+  {item.reason && <p>{item.reason}</p>}
+</div>
+
+  <strong>${estimatedPrice.toLocaleString()}</strong>
+</li>
                   )
                 })}
               </ul>
