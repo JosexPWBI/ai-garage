@@ -454,4 +454,26 @@ input[type="file"]::file-selector-button:hover {
   h1 {
     font-size: clamp(42px, 14vw, 64px);
   }
-}}
+}}.ai-advice {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #00b7d9;
+  border-radius: 10px;
+  background: #0f1b26;
+}
+
+.ai-advice h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #00b7d9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-advice-text {
+  line-height: 1.6;
+}
+
+.ai-advice-text p {
+  margin: 0 0 10px;
+}

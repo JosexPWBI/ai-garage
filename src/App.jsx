@@ -11,7 +11,9 @@ function App() {
   const [photo, setPhoto] = useState(null)
   const [showBuild, setShowBuild] = useState(false)
 const [error, setError] = useState('')
+const [aiAdvice, setAiAdvice] = useState('')
 const currentVehicleKey = `${make} ${model}`.trim().toLowerCase()
+const [loading, setLoading] = useState(false)
 const currentVehicleProfile = vehicleData[currentVehicleKey]
  function handlePhotoChange(e) {
   const file = e.target.files[0]
@@ -163,9 +165,10 @@ if (goal === 'Daily Driver') {
 }
 }
 
-function handleBuild() {
+async function handleBuild() {
   setError('')
   setShowBuild(false)
+  setAiAdvice('')
 
   if (!year.trim() || !make.trim() || !model.trim()) {
     setError('Please enter the year, make, and model of your vehicle.')
@@ -182,7 +185,37 @@ function handleBuild() {
     return
   }
 
-  setShowBuild(true)
+  setLoading(true)
+
+  try {
+    const response = await fetch('http://localhost:3001/api/garage-advice', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        year,
+        make,
+        model,
+        goal,
+        budget: Number(budget),
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('AI Garage request failed.')
+    }
+
+    const data = await response.json()
+
+    setAiAdvice(data.advice)
+    setLoading(false)
+    setShowBuild(true)
+  } catch (err) {
+    console.error(err)
+    setLoading(false)
+    setError('Could not connect to the AI Garage advisor.')
+  }
 }
 const recommendations = getRecommendations()
   const buildBudget = Number(budget) || 0
@@ -270,9 +303,16 @@ const recommendations = getRecommendations()
             />
           </label>
 
-          <button type="button" onClick={handleBuild}>
-            Build My Garage
-          </button>
+ <button
+  type="button"
+  onClick={handleBuild}
+  disabled={loading}
+>
+  {loading ? 'Building Your Plan...' : 'Build My Garage'}
+</button>
+{loading && (
+  <p className="loading-message">AI Garage is building your plan...</p>
+)}
 {error && (
   <p className="form-error">
     {error}
@@ -281,6 +321,24 @@ const recommendations = getRecommendations()
           {showBuild && (
             <div className="build-result">
               <h2>Your AI Garage Plan</h2> 
+              
+ 
+{aiAdvice && (
+  <div className="ai-advice">
+    <h3>PWBI AI Garage Advisor</h3>
+    <div className="ai-advice-text">
+      {aiAdvice.split('\n').map((line, index) => {
+        const cleanLine = line.replace(/[#*|]/g, '').trim()
+
+        if (!cleanLine || /^-+$/.test(cleanLine)) {
+          return null
+        }
+
+        return <p key={index}>{cleanLine}</p>
+      })}
+    </div>
+  </div>
+)}
               <div className="advisor-note">
   <h3>Garage Advisor Note</h3>
 
