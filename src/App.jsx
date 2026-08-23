@@ -188,7 +188,7 @@ async function handleBuild() {
   setLoading(true)
 
   try {
-    const response = await fetch('http://localhost:3001/api/garage-advice', {
+const response = await fetch('https://ai-garage-api.onrender.com/api/garage-advice', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
