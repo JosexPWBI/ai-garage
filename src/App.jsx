@@ -223,129 +223,282 @@ const recommendations = getRecommendations()
   return (
     <main className="garage">
       <section className="hero">
-        <p className="eyebrow">PWBI INNOVATION LAB</p>
-        <h1>AI Garage</h1>
+  <p className="eyebrow">PWBI INNOVATION LAB</p>
 
-        <p className="subtitle">
-          Upload your ride. Set your budget. Build your vision.
-        </p>
+  <h1>AI Garage</h1>
+
+  <p className="hero-tagline">
+    Build smarter. Build your way.
+  </p>
+
+  <p className="subtitle">
+    Upload your ride, choose your goal, set your budget, and let AI Garage create a practical build plan tailored to your vehicle.
+  </p>
+
+  <p className="powered-by">
+    Powered by Project: We Built It
+  </p>
 
         <div className="garage-card">
-          <h2>Start Your Build</h2>
+  <div className="form-heading">
+    <p className="form-kicker">BUILD CONFIGURATOR</p>
+    <h2>Start Your Build</h2>
+    <p className="form-intro">
+      Tell AI Garage what you drive, what you want from it, and what you want to spend.
+    </p>
+  </div>
 
-          <label>
-            Vehicle Photo
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-            />
-          </label>
+  <div className="photo-upload">
+    <label>
+      Vehicle Photo
+      <span className="field-help">Optional — upload a photo of your ride.</span>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handlePhotoChange}
+      />
+    </label>
+  </div>
 
-          {photo && (
-            <img
-              src={photo}
-              alt="Uploaded vehicle"
-              className="vehicle-preview"
-            />
-          )}
+  {photo && (
+    <img
+      src={photo}
+      alt="Uploaded vehicle"
+      className="vehicle-preview"
+    />
+  )}
 
-          <div className="vehicle-grid">
-            <label>
-              Year
-              <input
-                type="text"
-                placeholder="2020"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-              />
-            </label>
+  <div className="vehicle-grid">
+    <label>
+      Year
+      <input
+        type="text"
+        placeholder="2020"
+        value={year}
+        onChange={(e) => setYear(e.target.value)}
+      />
+    </label>
 
-            <label>
-              Make
-              <input
-                type="text"
-                placeholder="Ford"
-                value={make}
-                onChange={(e) => setMake(e.target.value)}
-              />
-            </label>
+    <label>
+      Make
+      <input
+        type="text"
+        placeholder="Ford"
+        value={make}
+        onChange={(e) => setMake(e.target.value)}
+      />
+    </label>
 
-            <label>
-              Model
-              <input
-                type="text"
-                placeholder="Mustang"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-              />
-            </label>
-          </div>
-<label>
-  Build Goal
-  <select
-    value={goal}
-    onChange={(e) => setGoal(e.target.value)}
+    <label>
+      Model
+      <input
+        type="text"
+        placeholder="Mustang"
+        value={model}
+        onChange={(e) => setModel(e.target.value)}
+      />
+    </label>
+  </div>
+
+  <div className="build-options-grid">
+    <label>
+      Build Goal
+      <select
+        value={goal}
+        onChange={(e) => setGoal(e.target.value)}
+      >
+        <option>Daily Driver</option>
+        <option>Street Performance</option>
+        <option>Track</option>
+        <option>Show Car</option>
+      </select>
+    </label>
+
+    <label>
+      Build Budget
+      <div className="budget-field">
+        <span className="budget-symbol">$</span>
+        <input
+          type="number"
+          placeholder="5000"
+          value={budget}
+          onChange={(e) => setBudget(e.target.value)}
+        />
+      </div>
+    </label>
+  </div>
+
+  <button
+    className="build-button"
+    type="button"
+    onClick={handleBuild}
+    disabled={loading}
   >
-    <option>Daily Driver</option>
-    <option>Street Performance</option>
-    <option>Track</option>
-    <option>Show Car</option>
-  </select>
-</label>
-          <label>
-            Build Budget
-            <input
-              type="number"
-              placeholder="5000"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-            />
-          </label>
+    {loading ? 'Building Your Plan...' : 'Build My Garage'}
+  </button>
 
- <button
-  type="button"
-  onClick={handleBuild}
-  disabled={loading}
->
-  {loading ? 'Building Your Plan...' : 'Build My Garage'}
-</button>
-{loading && (
-  <p className="loading-message">AI Garage is building your plan...</p>
-)}
-{error && (
-  <p className="form-error">
-    {error}
-  </p>
-)}
-          {showBuild && (
-            <div className="build-result">
-              <h2>Your AI Garage Plan</h2> 
-              
- 
-{aiAdvice && (
-  <div className="ai-advice">
-    <h3>PWBI AI Garage Advisor</h3>
-    <div className="ai-advice-text">
-      {aiAdvice.split('\n').map((line, index) => {
-        const cleanLine = line.replace(/[#*|]/g, '').trim()
-
-        if (!cleanLine || /^-+$/.test(cleanLine)) {
-          return null
-        }
-
-        return <p key={index}>{cleanLine}</p>
-      })}
+  {loading && (
+    <div className="loading-panel">
+      <div className="loading-dot"></div>
+      <p>AI Garage is building your personalized plan...</p>
     </div>
+  )}
+
+  {error && (
+    <p className="form-error">
+      {error}
+    </p>
+  )}
+
+ {showBuild && (
+  <div className="build-result">
+    <div className="result-heading">
+      <p className="form-kicker">YOUR BUILD PLAN</p>
+      <h2>Your AI Garage Plan</h2>
+    </div>
+
+    {aiAdvice && (
+      <div className="ai-advice">
+        <h3>PWBI AI Garage Advisor</h3>
+
+        <div className="ai-advice-text">
+          {(() => {
+            const lines = aiAdvice
+              .split('\n')
+              .map((line) => line.replace(/[#*|]/g, '').trim())
+              .filter((line) => line && !/^-+$/.test(line))
+
+            const summaryIndex = lines.findIndex((line) =>
+              /^Advisor Summary$/i.test(line)
+            )
+
+            const upgradesIndex = lines.findIndex((line) =>
+              /^Recommended Upgrades$/i.test(line)
+            )
+
+            const warningIndex = lines.findIndex((line) =>
+              /^(Modification to Wait On|Modification to Delay|Wait Until Later|Warning)$/i.test(line)
+            )
+
+            const summaryStart = summaryIndex >= 0 ? summaryIndex + 1 : 0
+
+            const summaryEnd =
+              upgradesIndex >= 0
+                ? upgradesIndex
+                : warningIndex >= 0
+                ? warningIndex
+                : lines.length
+
+            const summaryLines = lines.slice(
+              summaryStart,
+              summaryEnd
+            )
+
+            const upgradesEnd =
+              warningIndex >= 0 ? warningIndex : lines.length
+
+            const upgradeLines =
+              upgradesIndex >= 0
+                ? lines.slice(upgradesIndex + 1, upgradesEnd)
+                : []
+
+            const upgradeCards = []
+
+            upgradeLines.forEach((line) => {
+              if (/^\d+\./.test(line)) {
+                upgradeCards.push({
+                  title: line,
+                  details: [],
+                })
+              } else if (upgradeCards.length > 0) {
+                upgradeCards[
+                  upgradeCards.length - 1
+                ].details.push(line)
+              }
+            })
+
+            const warningLines =
+              warningIndex >= 0
+                ? lines.slice(warningIndex + 1)
+                : []
+
+            return (
+              <>
+                {summaryLines.length > 0 && (
+                  <div className="advisor-summary-card">
+                    <span className="advice-label">
+                      Advisor Summary
+                    </span>
+
+                    {summaryLines.map((line, index) => (
+                      <p key={index}>{line}</p>
+                    ))}
+                  </div>
+                )}
+
+                {upgradeCards.length > 0 && (
+                  <div className="upgrade-section">
+                    <div className="upgrade-section-heading">
+                      Recommended Upgrades
+                    </div>
+
+                    <div className="upgrade-card-list">
+                      {upgradeCards.map((upgrade, index) => (
+                        <div
+                          className="upgrade-card"
+                          key={index}
+                        >
+                          <div className="upgrade-card-number">
+                            {index + 1}
+                          </div>
+
+                          <div className="upgrade-card-content">
+                            <h4>
+                              {upgrade.title.replace(
+                                /^\d+\.\s*/,
+                                ''
+                              )}
+                            </h4>
+
+                            {upgrade.details.map(
+                              (detail, detailIndex) => (
+                                <p key={detailIndex}>
+                                  {detail.replace(/^-\s*/, '')}
+                                </p>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {warningLines.length > 0 && (
+                  <div className="advice-warning">
+                    <span className="advice-label">
+                      Modification to Wait On
+                    </span>
+
+                    {warningLines.map((line, index) => (
+                      <p key={index}>
+                        {line.replace(/^-\s*/, '')}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </>
+            )
+          })()}
+        </div>
+      </div>
+    )}
   </div>
 )}
-    
-            </div>
-          )}
-        </div>
-      </section>
-    </main>
+
+</div>
+</section>
+</main>
   )
 }
-
 export default App
