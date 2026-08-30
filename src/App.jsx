@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import vehicleData from './VehicleData'
+import { supabase } from './supabaseClient'
+import MyGarage from './MyGarage'
 
 function App() {
   const [year, setYear] = useState('')
@@ -12,12 +14,74 @@ function App() {
   const [showBuild, setShowBuild] = useState(false)
 const [error, setError] = useState('')
 const [aiAdvice, setAiAdvice] = useState('')
-const currentVehicleKey = `${make} ${model}`.trim().toLowerCase()
 const [loading, setLoading] = useState(false)
-const currentVehicleProfile = vehicleData[currentVehicleKey]
- function handlePhotoChange(e) {
-  const file = e.target.files[0]
+const [user, setUser] = useState(null)
+const [authEmail, setAuthEmail] = useState('')
+const [authPassword, setAuthPassword] = useState('')
+const [showMyGarage, setShowMyGarage] = useState(false)
+useEffect(() => {
+  supabase.auth.getSession().then(({ data }) => {
+    setUser(data.session?.user ?? null)
+  })
 
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null)
+  })
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
+async function handleSignUp() {
+  setError('')
+
+  const { error } = await supabase.auth.signUp({
+    email: authEmail,
+    password: authPassword,
+  })
+
+  if (error) {
+    setError(error.message)
+    return
+  }
+
+  setError('Check your email to confirm your account.')
+}
+
+async function handleSignIn() {
+  setError('')
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: authEmail,
+    password: authPassword,
+  })
+
+  if (error) {
+    setError(error.message)
+  }
+}
+
+async function handleSignOut() {
+  await supabase.auth.signOut()
+}
+async function handleSaveBuild() {
+  if (!user) {
+    setError('Please log in before saving a build.')
+    return
+  }
+
+  if (!aiAdvice) {
+    setError('Build a garage plan before saving.')
+    return
+  }
+
+  setError('Save Build is ready. Database storage will be connected once Supabase is available.')
+}
+
+function handlePhotoChange(e) {
+  const file = e.target.files[0]
   setError('')
 
   if (!file) {
@@ -219,7 +283,9 @@ const response = await fetch('https://ai-garage-api.onrender.com/api/garage-advi
 }
 const recommendations = getRecommendations()
   const buildBudget = Number(budget) || 0
-
+if (showMyGarage) {
+return <MyGarage onBack={() => setShowMyGarage(false)} />
+}
   return (
     <main className="garage">
       <section className="hero">
@@ -238,7 +304,71 @@ const recommendations = getRecommendations()
   <p className="powered-by">
     Powered by Project: We Built It
   </p>
+  <button
+  type="button"
+  onClick={() => setShowMyGarage(true)}
+  className="auth-button"
+>
+  My Garage — Test
+</button>
+<div className="auth-panel">
+  {user ? (
+    <div className="auth-user">
+      <span>Signed in as {user.email}</span>
+<button
+  type="button"
+  onClick={() => setShowMyGarage(true)}
+  className="auth-button"
+>
+  My Garage
+</button>
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="auth-button secondary"
+      >
+        Log Out
+      </button>
+    </div>
+  ) : (
+    <>
+      <p className="form-kicker">MEMBER ACCESS</p>
+      <h2>Create Account or Log In</h2>
 
+      <input
+        type="email"
+        placeholder="Email"
+        value={authEmail}
+        onChange={(e) => setAuthEmail(e.target.value)}
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={authPassword}
+        onChange={(e) => setAuthPassword(e.target.value)}
+      />
+
+      <div className="auth-actions">
+        <button
+          type="button"
+          onClick={handleSignUp}
+          className="auth-button"
+        >
+          Create Account
+        </button>
+
+        <button
+          type="button"
+          onClick={handleSignIn}
+          className="auth-button secondary"
+        >
+          Log In
+        </button>
+      </div>
+    </>
+  )}
+</div>
         <div className="garage-card">
   <div className="form-heading">
     <p className="form-kicker">BUILD CONFIGURATOR</p>
@@ -356,6 +486,19 @@ const recommendations = getRecommendations()
       <p className="form-kicker">YOUR BUILD PLAN</p>
       <h2>Your AI Garage Plan</h2>
     </div>
+
+
+<div className="save-build-row">
+  <button
+    type="button"
+    className="save-build-button"
+    disabled={!user || !aiAdvice}
+    onClick={handleSaveBuild}
+    title={!user ? 'Log in to save this build' : 'Save this build to My Garage'}
+  >
+    {user ? 'Save Build to My Garage' : 'Log In to Save Build'}
+  </button>
+</div>
 
     {aiAdvice && (
       <div className="ai-advice">
