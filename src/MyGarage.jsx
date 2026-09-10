@@ -28,7 +28,7 @@ export default function MyGarage({ onBack }) {
         } = await supabase
           .from('Builds')
           .select(
-            'id, user_id, year, make, model, goal, budget, recommendations, is_public, created_at'
+            'id, user_id, year, make, model, goal, budget, notes, recommendations, is_public, created_at'
           )
           .eq('user_id', user.id)
           .order('created_at', {
@@ -53,6 +53,7 @@ export default function MyGarage({ onBack }) {
             model: build.model,
             goal: build.goal,
             budget: Number(build.budget || 0),
+            notes: build.notes || '',
             recommendations: build.recommendations || [],
             isPublic: build.is_public || false,
             createdAt: build.created_at,
@@ -85,7 +86,12 @@ export default function MyGarage({ onBack }) {
           ? JSON.parse(storedBuilds)
           : []
 
-        setSavedBuilds(localBuilds)
+        setSavedBuilds(
+          localBuilds.map((build) => ({
+            ...build,
+            notes: build.notes || '',
+          }))
+        )
       } catch (error) {
         console.error(
           'Could not load local saved builds:',
@@ -128,6 +134,10 @@ export default function MyGarage({ onBack }) {
             {selectedBuild.isPublic
               ? 'Public Build'
               : 'Private Build'}
+          </p>
+
+          <p>
+            Notes: {selectedBuild.notes || ''}
           </p>
         </section>
 
