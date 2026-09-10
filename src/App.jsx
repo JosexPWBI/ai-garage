@@ -699,6 +699,7 @@ function App() {
             Build Notes
             <textarea
               placeholder="Add private notes about this build..."
+              maxLength={2000}
               value={notes}
               onChange={(e) =>
                 setNotes(e.target.value)
