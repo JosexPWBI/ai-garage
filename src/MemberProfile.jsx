@@ -200,7 +200,7 @@ export default function MemberProfile({ onBack }) {
       } = await supabase
         .from('Builds')
         .select(
-          'id, user_id, year, make, model, goal, budget, recommendations, is_public, created_at'
+          'id, user_id, year, make, model, goal, budget, notes, recommendations, is_public, created_at'
         )
         .eq('user_id', user.id)
         .order('created_at', {
@@ -372,6 +372,7 @@ export default function MemberProfile({ onBack }) {
             budget: Number(
               build.budget || 0
             ),
+            notes: build.notes || '',
             recommendations:
               build.recommendations ||
               [],
@@ -1456,6 +1457,9 @@ export default function MemberProfile({ onBack }) {
 
         budget:
           build.budget || 0,
+
+        notes:
+          build.notes || '',
 
         recommendations:
           build.recommendations || [],

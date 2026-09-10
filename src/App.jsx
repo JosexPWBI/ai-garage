@@ -12,6 +12,7 @@ function App() {
   const [goal, setGoal] = useState('Daily Driver')
   const [horsepowerGoal, setHorsepowerGoal] = useState('')
   const [budget, setBudget] = useState('')
+  const [notes, setNotes] = useState('')
   const [photo, setPhoto] = useState(null)
   const [showBuild, setShowBuild] = useState(false)
   const [error, setError] = useState('')
@@ -98,6 +99,7 @@ function App() {
       model: model.trim(),
       goal,
       budget: buildBudget,
+      notes: notes.trim(),
       recommendations: recommendationsWithBudget,
       is_public: false,
     }
@@ -129,6 +131,7 @@ function App() {
       model: savedBuild.model,
       goal: savedBuild.goal,
       budget: savedBuild.budget,
+      notes: savedBuild.notes || '',
       recommendations: savedBuild.recommendations || [],
       isPublic: savedBuild.is_public || false,
       isLiked: false,
@@ -691,6 +694,18 @@ function App() {
               </div>
             </label>
           </div>
+
+          <label>
+            Build Notes
+            <textarea
+              placeholder="Add private notes about this build..."
+              value={notes}
+              onChange={(e) =>
+                setNotes(e.target.value)
+              }
+              rows="4"
+            />
+          </label>
 
           <button
             className="build-button"
