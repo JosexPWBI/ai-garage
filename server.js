@@ -21,7 +21,7 @@ app.get('/api/health', (req, res) => {
 
 app.post('/api/garage-advice', async (req, res) => {
   try {
-    const { year, make, model, goal, budget } = req.body
+    const { year, make, model, goal, budget, horsepowerGoal } = req.body
 
     const response = await openai.responses.create({
       model: 'gpt-5.6-luna',
@@ -34,6 +34,7 @@ Year: ${year}
 Make: ${make}
 Model: ${model}
 Build goal: ${goal}
+Horsepower goal: ${horsepowerGoal || 'No specific horsepower goal'}
 Budget: $${budget}
 
 Prioritize safety, reliability, realistic budget allocation, and sensible upgrade order.
