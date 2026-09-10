@@ -21,33 +21,106 @@ app.get('/api/health', (req, res) => {
 
 app.post('/api/garage-advice', async (req, res) => {
   try {
-    const { year, make, model, goal, budget } = req.body
+    const {
+      year,
+      make,
+      model,
+      goal,
+      budget,
+      horsepowerGoal,
+    } = req.body
+
+    if (!year || !make || !model || !goal || !budget) {
+      return res.status(400).json({
+        error: 'Missing required vehicle or build information.',
+      })
+    }
 
     const response = await openai.responses.create({
       model: 'gpt-5.6-luna',
+
       input: `
-You are an automotive build advisor for PWBI AI Garage.
+You are the Project We Built It AI Garage automotive build advisor.
 
-Create a practical modification plan for this vehicle:
+Create a practical modification plan for this vehicle.
 
+Vehicle:
 Year: ${year}
 Make: ${make}
 Model: ${model}
+
 Build goal: ${goal}
-Budget: $${budget}
+Build budget: $${budget}
+Horsepower goal: ${
+        horsepowerGoal
+          ? `${horsepowerGoal} HP`
+          : 'No specific horsepower goal'
+      }
 
-Prioritize safety, reliability, realistic budget allocation, and sensible upgrade order.
+IMPORTANT HORSEPOWER INSTRUCTIONS:
 
-Give:
-1. A short advisor summary.
-2. Five recommended upgrades in priority order.
-3. A suggested dollar allocation for each upgrade.
-4. One warning about modifications that should wait until later.
-Do not use Markdown tables.
-Use simple headings and numbered lists.
-Keep each recommended upgrade easy to scan.
+If a horsepower goal is provided, you MUST explicitly evaluate that horsepower target.
 
-Keep the response concise and easy for a car enthusiast to understand.
+State the requested horsepower number in the Advisor Summary.
+
+Explain whether that horsepower target is realistic for this exact vehicle, build goal, and budget.
+
+If the target is realistic:
+- Explain the major upgrades needed to reach it safely.
+- Include supporting modifications such as fueling, cooling, tuning, drivetrain, brakes, suspension, and reliability upgrades when appropriate.
+
+If the target is NOT realistic:
+- Clearly say that the requested horsepower is not realistic within the current budget or build goal.
+- Explain why.
+- Give a more realistic horsepower range for the vehicle and budget.
+- Do not recommend unsafe shortcuts just to reach the requested number.
+
+Prioritize:
+1. Safety
+2. Reliability
+3. Realistic horsepower expectations
+4. Sensible modification order
+5. Staying within the user's budget
+6. Supporting modifications before aggressive power increases
+
+Return the response using this structure:
+
+### PWBI AI Garage Advisor
+
+**Advisor Summary**
+
+Give a concise summary of the build.
+
+If a horsepower goal was provided, explicitly mention the requested horsepower and whether it is realistic.
+
+**Recommended Upgrades**
+
+Give exactly five recommended upgrades in priority order.
+
+For each upgrade include:
+- Upgrade name
+- Suggested dollar allocation
+- Why it matters
+- How it supports the user's build goal
+- How it contributes to the horsepower goal when applicable
+
+Make sure the suggested allocations stay reasonably within the total build budget.
+
+**Horsepower Assessment**
+
+If a horsepower goal was provided:
+- State the requested horsepower.
+- State whether it is realistic.
+- Give an estimated realistic horsepower range for this build and budget.
+- Explain what would be required to go beyond that range.
+
+If no horsepower goal was provided, briefly explain that horsepower was not specified.
+
+**Modification to Wait On**
+
+Identify modifications that should wait until safety, maintenance, reliability, and supporting systems are addressed.
+
+Be practical and realistic. Do not promise exact horsepower numbers when results depend on engine condition, tuning, fuel, drivetrain, or dyno measurements.
       `,
     })
 
@@ -55,7 +128,7 @@ Keep the response concise and easy for a car enthusiast to understand.
       advice: response.output_text,
     })
   } catch (error) {
-    console.error(error)
+    console.error('AI Garage error:', error)
 
     res.status(500).json({
       error: 'Unable to generate AI Garage advice.',

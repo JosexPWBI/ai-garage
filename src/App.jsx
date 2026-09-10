@@ -10,6 +10,7 @@ function App() {
   const [make, setMake] = useState('')
   const [model, setModel] = useState('')
   const [goal, setGoal] = useState('Daily Driver')
+  const [horsepowerGoal, setHorsepowerGoal] = useState('')
   const [budget, setBudget] = useState('')
   const [photo, setPhoto] = useState(null)
   const [showBuild, setShowBuild] = useState(false)
@@ -402,6 +403,9 @@ function App() {
             make,
             model,
             goal,
+            horsepowerGoal: horsepowerGoal
+              ? Number(horsepowerGoal)
+              : null,
             budget: Number(budget),
           }),
         }
@@ -647,6 +651,25 @@ function App() {
                 <option>Track</option>
                 <option>Show Car</option>
               </select>
+            </label>
+
+            <label>
+              Horsepower Goal
+
+              <div className="budget-field">
+                <input
+                  type="number"
+                  placeholder="Optional"
+                  value={horsepowerGoal}
+                  onChange={(e) =>
+                    setHorsepowerGoal(e.target.value)
+                  }
+                />
+
+                <span className="budget-symbol">
+                  HP
+                </span>
+              </div>
             </label>
 
             <label>
