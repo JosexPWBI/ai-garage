@@ -706,6 +706,9 @@ function App() {
               }
               rows="4"
             />
+            <span className="field-help">
+              {notes.length} / 2000 characters
+            </span>
           </label>
 
           <button
