@@ -4,6 +4,7 @@ import vehicleData from './VehicleData'
 import { supabase } from './supabaseClient'
 import MyGarage from './MyGarage'
 import MemberProfile from './MemberProfile'
+import ThreeDGarage from './ThreeDGarage'
 
 function App() {
   const [year, setYear] = useState('')
@@ -21,6 +22,7 @@ function App() {
   const [authPassword, setAuthPassword] = useState('')
   const [showMyGarage, setShowMyGarage] = useState(false)
   const [showMemberProfile, setShowMemberProfile] = useState(false)
+  const [showThreeDGarage, setShowThreeDGarage] = useState(false)
 
   const buildSectionRef = useRef(null)
 
@@ -435,7 +437,18 @@ function App() {
       />
     )
   }
-
+if (showThreeDGarage) {
+  return (
+    <ThreeDGarage
+      onBack={() => setShowThreeDGarage(false)}
+      year={year}
+      make={make}
+      model={model}
+      goal={goal}
+      budget={budget}
+    />
+  )
+}
   if (showMyGarage) {
     return (
       <MyGarage
@@ -498,7 +511,13 @@ function App() {
               >
                 Member Profile
               </button>
-
+<button
+  type="button"
+  onClick={() => setShowThreeDGarage(true)}
+  className="auth-button"
+>
+  3D Garage
+</button>
               <button
                 type="button"
                 onClick={handleSignOut}
