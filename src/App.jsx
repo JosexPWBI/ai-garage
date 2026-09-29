@@ -5,6 +5,11 @@ import { supabase } from './supabaseClient'
 import MyGarage from './MyGarage'
 import MemberProfile from './MemberProfile'
 
+// Capture only recovery state before the auth client consumes the URL fragment.
+const recoveryParams = new URLSearchParams(window.location.hash.slice(1))
+const recoveryRequested = recoveryParams.get('type') === 'recovery'
+const recoveryLinkError = recoveryParams.has('error')
+
 function App() {
   const [year, setYear] = useState('')
   const [make, setMake] = useState('')
@@ -21,26 +26,109 @@ function App() {
   const [user, setUser] = useState(null)
   const [authEmail, setAuthEmail] = useState('')
   const [authPassword, setAuthPassword] = useState('')
+  const [recovering, setRecovering] = useState(recoveryRequested)
+  const [recoveryReady, setRecoveryReady] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [recoveryBusy, setRecoveryBusy] = useState(false)
+  const [recoveryMessage, setRecoveryMessage] = useState(
+    recoveryLinkError ? 'This recovery link is invalid or expired. Request a new link below.' : ''
+  )
   const [showMyGarage, setShowMyGarage] = useState(false)
   const [showMemberProfile, setShowMemberProfile] = useState(false)
 
   const buildSectionRef = useRef(null)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data, error: sessionError }) => {
       setUser(data.session?.user ?? null)
+      if (recoveryRequested) {
+        setRecoveryReady(Boolean(data.session) && !sessionError)
+        if (!data.session || sessionError) {
+          setRecovering(false)
+          setRecoveryMessage('This recovery link is invalid or expired. Request a new link below.')
+        }
+      }
     })
+    if (recoveryLinkError) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (_event === 'PASSWORD_RECOVERY') {
+        setRecovering(true)
+        setRecoveryReady(Boolean(session))
+        setRecoveryMessage('')
+        setShowMyGarage(false)
+        setShowMemberProfile(false)
+      }
+      if (_event === 'SIGNED_OUT') {
+        setRecoveryReady(false)
+        setNewPassword('')
+        setConfirmPassword('')
+      }
     })
 
     return () => {
       subscription.unsubscribe()
     }
   }, [])
+
+  async function handlePasswordRecovery() {
+    if (recoveryBusy) return
+    if (!authEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authEmail.trim())) {
+      setRecoveryMessage('Enter your account email first.')
+      return
+    }
+    setRecoveryBusy(true)
+    setRecoveryMessage('')
+    try {
+      // Use the configured live Site URL, including for dashboard-issued links.
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(authEmail.trim())
+      setRecoveryMessage(resetError ? resetError.message :
+        'If this email has an account, a reset link is on its way. Use the newest email and open the link once.')
+    } catch {
+      setRecoveryMessage('Could not reach the sign-in service. Please try again.')
+    } finally {
+      setRecoveryBusy(false)
+    }
+  }
+
+  async function handleNewPassword(event) {
+    event.preventDefault()
+    if (recoveryBusy || !recoveryReady) return
+    if (newPassword.length < 8) {
+      setRecoveryMessage('Use at least 8 characters for your new password.')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setRecoveryMessage('The passwords do not match.')
+      return
+    }
+    setRecoveryBusy(true)
+    setRecoveryMessage('')
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
+      if (updateError) {
+        setRecoveryMessage(updateError.message)
+        return
+      }
+      setNewPassword('')
+      setConfirmPassword('')
+      setAuthPassword('')
+      setRecovering(false)
+      setRecoveryReady(false)
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      setRecoveryMessage('Your password has been updated. You can now use it to sign in.')
+    } catch {
+      setRecoveryMessage('Could not update your password. Please try again.')
+    } finally {
+      setRecoveryBusy(false)
+    }
+  }
 
   async function handleSignUp() {
     setError('')
@@ -443,6 +531,30 @@ function App() {
     )
   }
 
+  if (recovering) {
+    return (
+      <div className="app"><div className="auth-panel">
+        <p className="form-kicker">AI GARAGE ACCOUNT RECOVERY</p>
+        <h1>Choose a new password</h1>
+        <p>{recoveryReady ? `Updating password for ${user?.email || 'your account'}.` : 'Checking your recovery link…'}</p>
+        <form onSubmit={handleNewPassword}>
+          <label htmlFor="new-password">New password</label>
+          <input id="new-password" type="password" autoComplete="new-password"
+            minLength={8} required value={newPassword} disabled={!recoveryReady || recoveryBusy}
+            onChange={(event) => setNewPassword(event.target.value)} />
+          <label htmlFor="confirm-password">Confirm new password</label>
+          <input id="confirm-password" type="password" autoComplete="new-password"
+            minLength={8} required value={confirmPassword} disabled={!recoveryReady || recoveryBusy}
+            onChange={(event) => setConfirmPassword(event.target.value)} />
+          <button className="auth-button" type="submit" disabled={!recoveryReady || recoveryBusy}>
+            {recoveryBusy ? 'Updating…' : 'Save new password'}
+          </button>
+        </form>
+        {recoveryMessage && <p role="status">{recoveryMessage}</p>}
+      </div></div>
+    )
+  }
+
   if (showMyGarage) {
     return (
       <MyGarage
@@ -483,6 +595,7 @@ function App() {
           Powered by Project: We Built It
         </p>
 
+        {recoveryMessage && <p role="status">{recoveryMessage}</p>}
         <div className="auth-panel">
           {user ? (
             <div className="auth-user">
@@ -555,6 +668,10 @@ function App() {
                   className="auth-button secondary"
                 >
                   Log In
+                </button>
+                <button type="button" className="auth-button secondary"
+                  disabled={recoveryBusy} onClick={handlePasswordRecovery}>
+                  {recoveryBusy ? 'Sending…' : 'Forgot password?'}
                 </button>
               </div>
             </>
