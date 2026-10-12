@@ -10,6 +10,27 @@ const recoveryParams = new URLSearchParams(window.location.hash.slice(1))
 const recoveryRequested = recoveryParams.get('type') === 'recovery'
 const recoveryLinkError = recoveryParams.has('error')
 
+const GUEST_ADVICE_LIMIT = 5
+const GUEST_USES_KEY = 'pwbiGuestAdviceUses'
+
+// Visitors get a few free builds before signing up. This is a browser-side
+// nudge, not a hard limit: clearing site data resets it.
+function guestUsesLeft() {
+  try {
+    return GUEST_ADVICE_LIMIT - (Number(localStorage.getItem(GUEST_USES_KEY)) || 0)
+  } catch {
+    return GUEST_ADVICE_LIMIT
+  }
+}
+
+function countGuestUse() {
+  try {
+    localStorage.setItem(GUEST_USES_KEY, String((Number(localStorage.getItem(GUEST_USES_KEY)) || 0) + 1))
+  } catch {
+    // Storage blocked: skip counting rather than block the visitor.
+  }
+}
+
 function App() {
   const [year, setYear] = useState('')
   const [make, setMake] = useState('')
@@ -192,14 +213,24 @@ function App() {
       is_public: false,
     }
 
-    const {
+    // Save the advisor's answer too, so My Garage shows what the person read.
+    // Falls back to the old shape until the ai_advice column exists.
+    let {
       data: savedBuild,
       error: saveError,
     } = await supabase
       .from('Builds')
-      .insert(buildData)
+      .insert(aiAdvice ? { ...buildData, ai_advice: aiAdvice } : buildData)
       .select()
       .single()
+
+    if (saveError && aiAdvice && /ai_advice/i.test(saveError.message || '')) {
+      ;({ data: savedBuild, error: saveError } = await supabase
+        .from('Builds')
+        .insert(buildData)
+        .select()
+        .single())
+    }
 
     if (saveError) {
       console.error('Could not save build to Supabase:', saveError)
@@ -479,6 +510,13 @@ function App() {
       return
     }
 
+    if (!user && guestUsesLeft() <= 0) {
+      setError(
+        `You've used your ${GUEST_ADVICE_LIMIT} free builds. Create a free account or log in to keep building.`
+      )
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -498,6 +536,7 @@ function App() {
               ? Number(horsepowerGoal)
               : null,
             budget: Number(budget),
+            notes: notes.trim(),
           }),
         }
       )
@@ -509,6 +548,7 @@ function App() {
       const data = await response.json()
 
       setAiAdvice(data.advice)
+      if (!user) countGuestUse()
       setLoading(false)
       setShowBuild(true)
     } catch (err) {
@@ -915,6 +955,13 @@ function App() {
                           )
                         )
 
+                      const horsepowerIndex =
+                        lines.findIndex((line) =>
+                          /^Horsepower Assessment$/i.test(
+                            line
+                          )
+                        )
+
                       const warningIndex =
                         lines.findIndex((line) =>
                           /^(Modification to Wait On|Modification to Delay|Wait Until Later|Warning)$/i.test(
@@ -941,9 +988,21 @@ function App() {
                         )
 
                       const upgradesEnd =
-                        warningIndex >= 0
+                        horsepowerIndex > upgradesIndex
+                          ? horsepowerIndex
+                          : warningIndex >= 0
                           ? warningIndex
                           : lines.length
+
+                      const horsepowerLines =
+                        horsepowerIndex >= 0
+                          ? lines.slice(
+                              horsepowerIndex + 1,
+                              warningIndex > horsepowerIndex
+                                ? warningIndex
+                                : lines.length
+                            )
+                          : []
 
                       const upgradeLines =
                         upgradesIndex >= 0
@@ -1064,6 +1123,26 @@ function App() {
                                   )
                                 )}
                               </div>
+                            </div>
+                          )}
+
+                          {horsepowerLines.length >
+                            0 && (
+                            <div className="advisor-summary-card">
+                              <span className="advice-label">
+                                Horsepower Assessment
+                              </span>
+
+                              {horsepowerLines.map(
+                                (line, index) => (
+                                  <p key={index}>
+                                    {line.replace(
+                                      /^-\s*/,
+                                      ''
+                                    )}
+                                  </p>
+                                )
+                              )}
                             </div>
                           )}
 
