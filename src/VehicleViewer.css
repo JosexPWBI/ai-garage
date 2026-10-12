@@ -1,0 +1,20 @@
+.vehicle-room { max-width: 1200px; margin: 0 auto; padding: 32px 22px; color: #eaf5fa; }
+.vehicle-room-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.vehicle-room-heading h1 { font-size: clamp(26px, 4vw, 42px); margin: 8px 0; }
+.vehicle-stage { position: relative; margin-top: 24px; border: 1px solid #315264; border-radius: 18px; background: radial-gradient(ellipse at center, #344754, #111b25 75%); overflow: hidden; }
+.vehicle-stage model-viewer { display: block; width: 100%; height: clamp(320px, 62vh, 660px); --progress-bar-color: #6ce3cd; }
+.vehicle-status { position: absolute; inset: 35% 12% auto; text-align: center; background: #101b26; padding: 20px; border-radius: 12px; }
+.vehicle-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 18px 0; }
+.vehicle-controls span, .vehicle-disclaimer, .vehicle-credits { color: #b9cbd5; line-height: 1.6; }
+.vehicle-room button, .viewer-launch { padding: 12px 18px; min-height: 44px; border-radius: 9px; border: 1px solid #6ce3cd; background: #102b35; color: #ecffff; cursor: pointer; }
+.vehicle-room button:disabled { opacity: .45; cursor: default; }
+.vehicle-room button:focus-visible, .viewer-launch:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.vehicle-credits { border-top: 1px solid #315264; margin-top: 22px; padding-top: 16px; font-size: 13px; }
+.vehicle-credits a { color: #7de9dd; text-decoration: underline; }
+.viewer-launch { margin: 14px 0; }
+.vehicle-room .vehicle-room-heading h1 { color: #eaf5fa; }
+.vehicle-room .vehicle-room-heading { background: transparent; border: 0; padding: 0; text-align: left; }
+.vehicle-room .vehicle-room-heading button, .vehicle-room .vehicle-controls button { width: auto; }
+
+.vehicle-picker { display: block; margin-top: 20px; color: #eaf5fa; }
+.vehicle-picker select { display: block; margin-top: 8px; padding: 12px; width: min(100%, 400px); background: #102b35; color: #fff; border: 1px solid #6ce3cd; border-radius: 8px; }

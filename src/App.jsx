@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import './App.css'
 import vehicleData from './VehicleData'
 import { supabase } from './supabaseClient'
 import MyGarage from './MyGarage'
 import MemberProfile from './MemberProfile'
 
+const VehicleViewer = lazy(() => import('./VehicleViewer'))
+
 function App() {
+  const [showViewer, setShowViewer] = useState(false)
   const [year, setYear] = useState('')
   const [make, setMake] = useState('')
   const [model, setModel] = useState('')
@@ -435,6 +438,10 @@ function App() {
   const recommendations = getRecommendations()
   const buildBudget = Number(budget) || 0
 
+  if (showViewer) {
+    return <Suspense fallback={<p role="status">Opening 3D Garage…</p>}><VehicleViewer onBack={() => setShowViewer(false)} /></Suspense>
+  }
+
   if (showMemberProfile) {
     return (
       <MemberProfile
@@ -482,6 +489,8 @@ function App() {
         <p className="powered-by">
           Powered by Project: We Built It
         </p>
+
+        <button type="button" className="viewer-launch" onClick={() => setShowViewer(true)}>Explore 3D Garage</button>
 
         <div className="auth-panel">
           {user ? (
