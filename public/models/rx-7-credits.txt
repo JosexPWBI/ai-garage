@@ -1,0 +1,18 @@
+Mazda RX-7 FD
+Creator: Lexyc16
+Creator profile: https://sketchfab.com/Lexyc16
+Model: https://sketchfab.com/3d-models/mazda-rx-7-fd-d35ff630df614771b82e7b2f59035b1e
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+License link: https://creativecommons.org/licenses/by/4.0/
+
+Attribution:
+"Mazda RX-7 FD" by Lexyc16, licensed under CC BY 4.0.
+Downloaded as Sketchfab's converted GLB; no additional modifications made.
+Retain the model, creator, and license links when displaying or distributing it.
+
+The model page also displays a NoAI restriction: do not use this asset in
+training datasets, development of generative AI, or as generative-AI input.
+Intended here as a conventional 3D rendering asset for AI Garage.
+
+Local check: GLB version 2, embedded resources, 5,243,568 bytes.
+Rendering and customization compatibility have not yet been verified.

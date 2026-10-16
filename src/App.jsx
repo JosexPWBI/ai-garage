@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import './App.css'
 import vehicleData from './VehicleData'
 import { supabase } from './supabaseClient'
@@ -9,8 +9,10 @@ import MemberProfile from './MemberProfile'
 const recoveryParams = new URLSearchParams(window.location.hash.slice(1))
 const recoveryRequested = recoveryParams.get('type') === 'recovery'
 const recoveryLinkError = recoveryParams.has('error')
+const VehicleViewer = lazy(() => import('./VehicleViewer'))
 
 function App() {
+  const [showViewer, setShowViewer] = useState(false)
   const [year, setYear] = useState('')
   const [make, setMake] = useState('')
   const [model, setModel] = useState('')
@@ -285,7 +287,6 @@ function App() {
   }
 
   function getRecommendations() {
-    const buildBudget = Number(budget) || 0
     const vehicleKey = `${make} ${model}`.trim().toLowerCase()
     const vehicleProfile = vehicleData[vehicleKey]
     const vehicleYear = Number(year)
@@ -523,6 +524,10 @@ function App() {
   const recommendations = getRecommendations()
   const buildBudget = Number(budget) || 0
 
+  if (showViewer) {
+    return <Suspense fallback={<p role="status">Opening 3D Garage…</p>}><VehicleViewer onBack={() => setShowViewer(false)} /></Suspense>
+  }
+
   if (showMemberProfile) {
     return (
       <MemberProfile
@@ -596,6 +601,8 @@ function App() {
         </p>
 
         {recoveryMessage && <p role="status">{recoveryMessage}</p>}
+        <button type="button" className="viewer-launch" onClick={() => setShowViewer(true)}>Explore 3D Garage</button>
+
         <div className="auth-panel">
           {user ? (
             <div className="auth-user">

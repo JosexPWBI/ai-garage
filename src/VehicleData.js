@@ -190,6 +190,44 @@ const vehicleData = {
       ],
     },
   },
+
+  'mazda rx-7': {
+    make: 'Mazda',
+    model: 'RX-7',
+    category: 'Rotary Sports Car',
+    strengths: [
+      'Lightweight construction',
+      'Excellent weight distribution',
+      'High-revving rotary engine potential',
+      'Iconic sports car platform',
+    ],
+    priorities: {
+      'Daily Driver': [
+        'Seals and rotary maintenance',
+        'Quality tires',
+        'Brake refresh',
+        'Cooling system',
+      ],
+      'Street Performance': [
+        'Performance tires',
+        'Suspension upgrade',
+        'Brake upgrade',
+        'Intake and exhaust',
+      ],
+      Track: [
+        'Track tires',
+        'Performance brakes',
+        'Cooling upgrades',
+        'Track-tuned suspension',
+      ],
+      'Show Car': [
+        'Wheels and fitment',
+        'Lowered suspension',
+        'Exterior aero',
+        'Interior details',
+      ],
+    },
+  },
 }
 
 export default vehicleData
