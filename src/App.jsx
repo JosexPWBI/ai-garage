@@ -39,6 +39,7 @@ function App() {
   )
   const [showMyGarage, setShowMyGarage] = useState(false)
   const [showMemberProfile, setShowMemberProfile] = useState(false)
+  const [upgradePhotos, setUpgradePhotos] = useState({})
 
   const buildSectionRef = useRef(null)
 
@@ -192,6 +193,7 @@ function App() {
       budget: buildBudget,
       notes: notes.trim(),
       recommendations: recommendationsWithBudget,
+      upgrade_photos: upgradePhotos,
       is_public: false,
     }
 
@@ -285,6 +287,28 @@ function App() {
     }
 
     setPhoto(URL.createObjectURL(file))
+  }
+
+  function handleUpgradePhotoChange(e, upgradeIndex) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setUpgradePhotos((prev) => ({
+        ...prev,
+        [upgradeIndex]: event.target?.result,
+      }))
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function removeUpgradePhoto(upgradeIndex) {
+    setUpgradePhotos((prev) => {
+      const updated = { ...prev }
+      delete updated[upgradeIndex]
+      return updated
+    })
   }
 
   function getRecommendations() {
@@ -1073,6 +1097,52 @@ function App() {
                                             </p>
                                           )
                                         )}
+
+                                        <div className="upgrade-photo-section">
+                                          {upgradePhotos[index] ? (
+                                            <div className="upgrade-photo-preview">
+                                              <img
+                                                src={
+                                                  upgradePhotos[
+                                                    index
+                                                  ]
+                                                }
+                                                alt={`${upgrade.title} reference`}
+                                                className="upgrade-photo-img"
+                                              />
+                                              <button
+                                                type="button"
+                                                className="remove-photo-btn"
+                                                onClick={() =>
+                                                  removeUpgradePhoto(
+                                                    index
+                                                  )
+                                                }
+                                              >
+                                                Remove Photo
+                                              </button>
+                                            </div>
+                                          ) : (
+                                            <label className="upgrade-photo-upload">
+                                              <span className="upload-icon">
+                                                📸
+                                              </span>
+                                              <span className="upload-text">
+                                                Add photo for this upgrade
+                                              </span>
+                                              <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) =>
+                                                  handleUpgradePhotoChange(
+                                                    e,
+                                                    index
+                                                  )
+                                                }
+                                              />
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
                                   )
