@@ -4,6 +4,7 @@ import vehicleData from './VehicleData'
 import { supabase } from './supabaseClient'
 import MyGarage from './MyGarage'
 import MemberProfile from './MemberProfile'
+import BuildProgress from './BuildProgress'
 
 // Capture only recovery state before the auth client consumes the URL fragment.
 const recoveryParams = new URLSearchParams(window.location.hash.slice(1))
@@ -872,6 +873,12 @@ function App() {
 
                 <h2>Your AI Garage Plan</h2>
               </div>
+
+              <BuildProgress
+                recommendations={recommendations}
+                budget={budget}
+                goal={goal}
+              />
 
               <div className="save-build-row">
                 <button
