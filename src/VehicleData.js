@@ -75,6 +75,44 @@ const vehicleData = {
     },
   },
 
+  'honda accord': {
+    make: 'Honda',
+    model: 'Accord',
+    category: 'Sport Sedan',
+    strengths: [
+      'Reliable K-series engines in 2003-2007 models',
+      'Comfortable daily platform',
+      'Shared parts with other Honda models',
+      'Room for the whole crew',
+    ],
+    priorities: {
+      'Daily Driver': [
+        'Maintenance refresh',
+        'Quality tires',
+        'Brake refresh',
+        'Suspension bushings and mounts',
+      ],
+      'Street Performance': [
+        'Performance tires',
+        'Sport springs and dampers',
+        'Brake upgrade',
+        'Intake, header and tune',
+      ],
+      Track: [
+        'Track tires',
+        'Brake pads and fluid',
+        'Coilovers and sway bars',
+        'Cooling upgrades',
+      ],
+      'Show Car': [
+        'Wheels and fitment',
+        'Lowering suspension',
+        'Exterior styling',
+        'Lighting upgrades',
+      ],
+    },
+  },
+
   'mazda miata': {
     make: 'Mazda',
     model: 'Miata',

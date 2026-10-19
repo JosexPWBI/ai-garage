@@ -22,18 +22,26 @@ export default function MyGarage({ onBack }) {
       }
 
       if (user) {
-        const {
+        const columns =
+          'id, user_id, year, make, model, goal, budget, notes, recommendations, is_public, created_at'
+        const loadBuilds = (select) =>
+          supabase
+            .from('Builds')
+            .select(select)
+            .eq('user_id', user.id)
+            .order('created_at', {
+              ascending: false,
+            })
+
+        // ai_advice is new; fall back to the old columns until it exists.
+        let {
           data: builds,
           error: buildsError,
-        } = await supabase
-          .from('Builds')
-          .select(
-            'id, user_id, year, make, model, goal, budget, notes, recommendations, is_public, created_at'
-          )
-          .eq('user_id', user.id)
-          .order('created_at', {
-            ascending: false,
-          })
+        } = await loadBuilds(columns + ', ai_advice')
+
+        if (buildsError && /ai_advice/i.test(buildsError.message || '')) {
+          ;({ data: builds, error: buildsError } = await loadBuilds(columns))
+        }
 
         if (buildsError) {
           console.error(
@@ -55,6 +63,7 @@ export default function MyGarage({ onBack }) {
             budget: Number(build.budget || 0),
             notes: build.notes || '',
             recommendations: build.recommendations || [],
+            aiAdvice: build.ai_advice || '',
             isPublic: build.is_public || false,
             createdAt: build.created_at,
           }))
@@ -140,6 +149,20 @@ export default function MyGarage({ onBack }) {
             Notes: {selectedBuild.notes || ''}
           </p>
         </section>
+
+        {selectedBuild.aiAdvice && (
+          <section>
+            <h2>AI Garage Advisor</h2>
+
+            {selectedBuild.aiAdvice
+              .split('\n')
+              .map((line) => line.replace(/[#*|]/g, '').trim())
+              .filter(Boolean)
+              .map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
+          </section>
+        )}
 
         <section>
           <h2>Recommended Build Plan</h2>
